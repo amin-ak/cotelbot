@@ -20,7 +20,7 @@ $update = json_decode($content, true);
         }
 
 
-// bot('sendmessage',['chat_id'=>412213803,'text'=>$update]);
+bot('sendmessage',['chat_id'=>1101154729,'text'=>$update]);
 
 
 function processMessage($update){
