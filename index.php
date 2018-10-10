@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // Import File
     require('core.php');
     require('db.php');
@@ -6,13 +6,35 @@
 $content = file_get_contents("php://input");
 $update = json_decode($content, true);
 
+$hr = "\n -------------------";
 //
     if(isset($update["message"])){
+
+        $getUsername = $update['message']['from']['username'];
+        $getFname = $update['message']['from']['first_name'];
+        $getLname = $update['message']['from']['last_name'];
+
+        $getUser = $getUsername.$hr."\n$getFname\n$getLname";
         processMessage($update);
+
+        bot('sendmessage',[
+
+            'chat_id'=>'@Molkabadi',
+            'text'=>'Click by @'.$getUser
+
+            ]);
+
     }
     elseif(isset($update["callback_query"]))
         {
+            $getUser = "Callback_query\nfrom @".$update['callback_query']['from']['username'];
             processCallback($update);
+            bot('sendmessage',[
+
+                'chat_id'=>'@Molkabadi',
+                'text'=>$getUser
+
+                ]);
         }
     elseif(isset($update["inline_query"]))
         {
@@ -20,7 +42,12 @@ $update = json_decode($content, true);
         }
 
 
-bot('sendmessage',['chat_id'=>1101154729,'text'=>$update]);
+// bot('sendmessage',[
+
+//     'chat_id'=>'@Molkabadi',
+//     'text'=>'Click by @'.$getUser
+
+//     ]);
 
 
 function processMessage($update){
@@ -29,28 +56,27 @@ function processMessage($update){
     }else{
         $text = null;
     }
-    
+
     $chat_id = $update['message']['chat']['id'];
     $db = Db::getInstance();
     if($chat_id == 412213803){
         if($text == '/start'){
             bot('sendmessage',[
                 'chat_id'=>$chat_id,
-                'text'=>'به پنل مدیریت خوش آمدید',
+                'text'=>'Welcome to Admin panel',
                 'reply_markup'=>[
                     'keyboard'=>[
-                        ['آمار'],['ساخت کلیکر']
+                        ['📊 Statistics','📝 Create New Post']
                     ],
-                    'resize_keyboard' => true, 
+                    'resize_keyboard' => true,
                 ]
             ]);
-            
+
         }
         // Start : Clicker
-        elseif($text == 'ساخت کلیکر'){
+        elseif($text == '📝 Create New Post'){
             $click_id = uniqid("click_");
-           // $start_id = uniqid("award_");
-            // bot('sendmessage',['chat_id'=>412213803,'text'=>$update]);
+
             // ---------------------
             if($db->modify('UPDATE admin SET status=:status,status_click_id=:click_id WHERE user_id=:chat_id',['chat_id'=>$chat_id,'click_id'=>$click_id,'status'=>'sendMedia']))
             {
@@ -59,10 +85,10 @@ function processMessage($update){
             else {
                 bot('sendmessage',['chat_id'=>412213803,'text'=>'clicker is failed']);
             }
-            
+
             if($db->insert('INSERT INTO clicks (click_id) VALUES (:click_id)',['click_id'=>$click_id]))
             {
-                    // bot('sendmessage',['chat_id'=>412213803,'text'=>'ok']);    
+                    // bot('sendmessage',['chat_id'=>412213803,'text'=>'ok']);
             }
             else {
                     // bot('sendmessage',['chat_id'=>412213803,'text'=>'no']);
@@ -70,19 +96,19 @@ function processMessage($update){
             // ---------------------
             bot('sendmessage',[
                 'chat_id'=>$chat_id,
-                'text'=>'تصویر پست رو ارسال کن 🏙 ',
+                'text'=>"🏙 Send Post Media\n\nInclude ➜ Image / Video / Gif",
                 'reply_markup'=>[
                     'keyboard'=>[
-                        ['بازگشت']
+                        ['◀ Back to Menu']
                     ],
-                    'resize_keyboard' => true, 
+                    'resize_keyboard' => true,
                 ]
             ]);
         }
         // END : Clicker
         // ========================================
         // Start : Amar
-        elseif($text == 'آمار'){
+        elseif($text == '📊 Statistics'){
             $member = $db->query('SELECT user_id FROM users');
             $count = count($member);
             bot('sendmessage',[
@@ -93,7 +119,7 @@ function processMessage($update){
         // END : Amar
         // =======================================
         // Start : back button
-        elseif($text == 'بازگشت'){
+        elseif($text == '◀ Back to Menu'){
             $result = $db->query('SELECT status,status_click_id FROM admin');
             if($result[0]['status_click_id'] == 0){
                 $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id',['status'=>0,'chat_id'=>$chat_id]);
@@ -103,10 +129,14 @@ function processMessage($update){
             }
             bot('sendmessage',[
                 'chat_id'=>$chat_id,
-                'text'=>'به منوی اصلی بازگشتید',
+                'text'=>'Back To MainMenu',
+            ]);
+            bot('sendmessage',[
+                'chat_id'=>$chat_id,
+                'text'=>'Choose a choice ⬇',
                 'reply_markup'=>[
                     'keyboard'=>[
-                        ['آمار'],['ساخت کلیکر']
+                        ['📊 Statistics','📝 Create New Post']
                     ],
                     'resize_keyboard' => true
 
@@ -120,9 +150,9 @@ function processMessage($update){
             $query = $db->query('SELECT * FROM admin');
             $status = $query[0]['status'];
             $click_id = $query[0]['status_click_id'];
-            // bot('sendmessage',['chat_id'=>412213803,'text'=>'hiiiii']); 
-            // bot('sendmessage',['chat_id'=>412213803,'text'=>$status]); 
-            // bot('sendmessage',['chat_id'=>412213803,'text'=>$click_id]); 
+            // bot('sendmessage',['chat_id'=>412213803,'text'=>'hiiiii']);
+            // bot('sendmessage',['chat_id'=>412213803,'text'=>$status]);
+            // bot('sendmessage',['chat_id'=>412213803,'text'=>$click_id]);
             if($status == 'sendMedia'){
                 if(isset($update['message']['photo'][2]['file_id'])){
                     $file_id = $update['message']['photo'][2]['file_id'];
@@ -130,14 +160,14 @@ function processMessage($update){
                     // bot('sendmessage',['chat_id'=>412213803,'text'=>$file_id]); // test
 
                     $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id',['chat_id'=>$chat_id,'status'=>'text_des']);
-                    // bot('sendmessage',['chat_id'=>412213803,'text'=>'update admin ok']);    
+                    // bot('sendmessage',['chat_id'=>412213803,'text'=>'update admin ok']);
                     $db->modify('UPDATE clicks SET file_id=:file_id,type=:type WHERE click_id=:click_id',['file_id'=>$file_id,'type'=>'photo','click_id'=>$click_id]);
                     bot('sendmessage',[
                         'chat_id'=>$chat_id,
-                        'text'=>'حالا متن زیر عکس رو بفرست 📝',
+                        'text'=>'📝 Send Caption ',
                         'reply_markup'=>[
                             'keyboard'=>[
-                                ['بازگشت']
+                                ['◀ Back to Menu']
                             ],'resize_keyboard' => true,
                         ]
                     ]);
@@ -147,11 +177,11 @@ function processMessage($update){
                     $db->modify('UPDATE clicks SET file_id=:file_id,type=:type WHERE click_id=:click_id',['file_id'=>$file_id,'type'=>'gif','click_id'=>$click_id]);
                     bot('sendmessage',[
                         'chat_id'=>$chat_id,
-                        'text'=>'حالا متن زیر عکس رو بفرست 📝',
+                        'text'=>'📝 Send Caption ',
                         'reply_markup'=>[
                             'keyboard'=>[
-                                ['بازگشت']
-                            ],'resize_keyboard' => true, 
+                                ['◀ Back to Menu']
+                            ],'resize_keyboard' => true,
                         ]
                     ]);
                 }elseif(isset($update['message']['video']['file_id'])){
@@ -160,10 +190,10 @@ function processMessage($update){
                     $db->modify('UPDATE clicks SET file_id=:file_id,type=:type WHERE click_id=:click_id',['file_id'=>$file_id,'type'=>'video','click_id'=>$click_id]);
                     bot('sendmessage',[
                         'chat_id'=>$chat_id,
-                        'text'=>'حالا متن زیر عکس رو بفرست 📝',
+                        'text'=>'📝 Send Caption ',
                         'reply_markup'=>[
                             'keyboard'=>[
-                                ['بازگشت']
+                                ['◀ Back to Menu']
                             ],'resize_keyboard' => true,
                         ]
                     ]);
@@ -171,7 +201,7 @@ function processMessage($update){
             }
             // Start : Description
             elseif($status == 'text_des'){
-                if(strlen($text) <= 200){
+                if(strlen($text) <= 4000){
                     $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id',['chat_id'=>$chat_id,'status'=>'count_click']);
                     $db->modify('UPDATE clicks SET text_des=:text_des WHERE click_id=:click_id',['text_des'=>$text,'click_id'=>$click_id]);
                     bot('sendmessage',[
@@ -179,7 +209,7 @@ function processMessage($update){
                         'text'=>'حالا تعداد کلیک رو بفرست #️⃣ ',
                         'reply_markup'=>[
                             'keyboard'=>[
-                                ['بازگشت']
+                                ['◀ Back to Menu']
                             ],'resize_keyboard' => true,
                         ]
                     ]);
@@ -189,12 +219,12 @@ function processMessage($update){
                         'text'=>'تعداد کاراکتر ها باید کمتر از ۲۰۰ باشه دوباره امتحان کن',
                         'reply_markup'=>[
                             'keyboard'=>[
-                                ['بازگشت']
+                                ['◀ Back to Menu']
                             ],'resize_keyboard' => true,
                         ]
                     ]);
                 }
-                
+
             }
             // End : Description
             // ========================================
@@ -207,7 +237,7 @@ function processMessage($update){
                     'text'=>'حالا اسم دکمه رو بفرست',
                     'reply_markup'=>[
                         'keyboard'=>[
-                            ['بازگشت']
+                            ['◀ Back to Menu']
                         ],'resize_keyboard' => true,
                     ]
                 ]);
@@ -223,8 +253,8 @@ function processMessage($update){
                     'text'=>'حالا لینک یا فایل جایزه رو بفرست',
                     'reply_markup'=>[
                         'keyboard'=>[
-                            ['بازگشت']
-                        ],'resize_keyboard' => true, 
+                            ['◀ Back to Menu']
+                        ],'resize_keyboard' => true,
                     ]
                 ]);
             }
@@ -241,7 +271,7 @@ function processMessage($update){
                         'text'=>'حالا متن بعدی جایزه رو بفرست',
                         'reply_markup'=>[
                             'keyboard'=>[
-                                ['بازگشت'],'resize_keyboard' => true, 
+                                ['◀ Back to Menu'],'resize_keyboard' => true,
                             ]
                         ]
                     ]);
@@ -253,8 +283,8 @@ function processMessage($update){
                         'text'=>'حالا متن بعدی جایزه رو بفرست',
                         'reply_markup'=>[
                             'keyboard'=>[
-                                ['بازگشت']
-                            ],'resize_keyboard' => true, 
+                                ['◀ Back to Menu']
+                            ],'resize_keyboard' => true,
                         ]
                     ]);
                 }
@@ -270,8 +300,8 @@ function processMessage($update){
                     'text'=>'حالا ایدی چنلی که میخوای توش اینو بفرسی بفرست(حتما باید ربات توش ادمین باشه',
                     'reply_markup'=>[
                         'keyboard'=>[
-                            ['بازگشت']
-                        ],'resize_keyboard' => true, 
+                            ['◀ Back to Menu']
+                        ],'resize_keyboard' => true,
                     ]
                 ]);
             }
@@ -320,12 +350,13 @@ function processMessage($update){
                 $db->modify('UPDATE clicks SET message_id=:message_id, chat_id=:chat_id WHERE click_id=:click_id',['message_id'=>$result['result']['message_id'],'chat_id'=>$result['result']['chat']['id'],'click_id'=>$click_id]);
                 bot('sendmessage',[
                     'chat_id'=>$chat_id,
-                    'text'=>'با موفقیت ارسال شد',
+                    'text'=>'Send file is complete',
                     'reply_markup'=>[
                         'keyboard'=>[
-                            ['آمار'],['ساخت کلیکر']
+                            ['📊 Statistics','📝 Create New Post'],
+                            ['📊 Send Message','📝 Create New Post']
                         ],
-                    'resize_keyboard' => true, 
+                    'resize_keyboard' => true,
                     ]
                 ]);
             }
@@ -352,7 +383,7 @@ function processMessage($update){
             'user_id'=>$chat_id
         ]);
         $getchannel3 = json_decode($getchannel3,true);
-        $channel_id_4 = '@ProjeKaar';
+        $channel_id_4 = '@FullPackage';
         $getchannel4 = bot('getChatMember',[
             'chat_id'=>$channel_id_4,
             'user_id'=>$chat_id
@@ -402,7 +433,7 @@ function processMessage($update){
                             'inline_keyboard'=>[
                                 [['text'=>'📪 به پایان رسید','callback_data'=>'end']],
                                 [['text'=>'📥 تعداد دانلود  : '.$result[0]['count_click'].' از '.$result[0]['count_click'],'callback_data'=>'null']]
-                                
+
 
 
                             ]
@@ -419,8 +450,7 @@ function processMessage($update){
 
         @ProjeYaab
         @Qbyte
-        @Codento
-        @ProjeKaar
+        @FullPackage
 
         2⃣ بعد از عضویت در کانالهای ذکر شده "حتما" دوباره به کانال @Codento برید و مجددا روی دریافت فایل بزنید.
 
@@ -434,6 +464,7 @@ function processMessage($update){
 function processCallback($update){
     $data = $update['callback_query']['data'];
     $id = $update['callback_query']['id'];
+    $firstname = $update['callback_query']['from']['first_name'];
 //     $inline_message_id = $update['callback_query']['inline_message_id'];
 //     $firstname = $update['callback_query']['from']['first_name'];
 //     bot('editMessageText',[
@@ -444,12 +475,12 @@ function processCallback($update){
     if($data == 'null'){
         bot('answerCallbackQuery',[
             'callback_query_id'=>$id,
-            'text'=>'🚫'
+            'text'=>"کُدِنتو |‌ حمایت شما به ما انگیزه میده 🍊 "
         ]);
     }elseif($data == 'end'){
         bot('answerCallbackQuery',[
             'callback_query_id'=>$id,
-            'text'=>'به پایان رسید'
+            'text'=>'❌ظرفیت دانلود فایل پر شده و شما نمیتونید فایل رو دریافت کنید ❌'
         ]);
     }elseif($data == 'buy'){
         bot('answerCallbackQuery',[
