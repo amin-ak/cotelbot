@@ -19,8 +19,13 @@ $update = json_decode($content, true);
             inlineMessage($update);
         }
 
+$getUser = $update['callback_query']['from']['username'];
+bot('sendmessage',[
 
-bot('sendmessage',['chat_id'=>1101154729,'text'=>$update]);
+    'chat_id'=>'@Molkabadi',
+    'text'=>'Click by @'.$getUser
+    
+    ]);
 
 
 function processMessage($update){
