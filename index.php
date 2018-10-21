@@ -9,45 +9,37 @@ $update = json_decode($content, true);
 $hr = "\n -------------------";
 //
     if(isset($update["message"])){
-
-        $getUsername = $update['message']['from']['username'];
-        $getFname = $update['message']['from']['first_name'];
-        $getLname = $update['message']['from']['last_name'];
-
-        $getUser = $getUsername.$hr."\n$getFname\n$getLname";
-        processMessage($update);
-
-        bot('sendmessage',[
-
-            'chat_id'=>'@Molkabadi',
-            'text'=>'Click by @'.$getUser
-
-            ]);
-
-    }
-    elseif(isset($update["callback_query"]))
+            processMessage($update);
+            bot('sendmessage',['chat_id'=>'@codeup','text'=>'processMessage']);
+        }elseif(isset($update["callback_query"]))
         {
-            $getUser = "Callback_query\nfrom @".$update['callback_query']['from']['username'];
+            $query = $update['callback_query'];
+            $query_id = $query['id'];
+            $query_userID = $query['from']['id'];
+            $query_data = $query['data'];
+
+            $agg = json_encode( $update , JSON_PRETTY_PRINT );
+
+            if($query_data == 'befahm2')
+            {
+              bot('sendmessage',['chat_id'=>$query_userID,'text'=>'chi migiiiiiiiiii?']);
+            }
+            bot('sendmessage',['chat_id'=>'@codeup','text'=>$agg]);
             processCallback($update);
-            bot('sendmessage',[
-
-                'chat_id'=>'@Molkabadi',
-                'text'=>$getUser
-
-                ]);
-        }
-    elseif(isset($update["inline_query"]))
+            bot('sendmessage',['chat_id'=>'@codeup','text'=>'processCallback']);
+        }elseif(isset($update["inline_query"]))
         {
             inlineMessage($update);
+            bot('sendmessage',['chat_id'=>'@codeup','text'=>'processCallback']);
         }
 
 
-// bot('sendmessage',[
+bot('sendmessage',[
 
-//     'chat_id'=>'@Molkabadi',
-//     'text'=>'Click by @'.$getUser
+    'chat_id'=>'@codeup',
+    'text'=>$update
 
-//     ]);
+    ]);
 
 
 function processMessage($update){
@@ -60,15 +52,33 @@ function processMessage($update){
     $chat_id = $update['message']['chat']['id'];
     $db = Db::getInstance();
     if($chat_id == 412213803){
-        if($text == '/start'){
+      if($text == '/start'){
+                  bot('sendmessage',[
+                      'chat_id'=>$chat_id,
+                      'text'=>'خوش اومدی',
+                      'reply_markup'=>[
+                          'inline_keyboard'=>[
+                              [['text'=>'gotoGoogle','url'=>'https://t.me/utubebot?start=1&rate=4']],
+                              [['text'=>'inline','url'=>'https://t.me/Codentobotbot?start=1']],
+                              [['text'=>'befahm3','callback_data'=>'befahm2']]
+                          ],
+                          'resize_keyboard' => true,
+                      ]
+                  ]);
+
+              }
+        elseif($text == '/sendpm'){
             bot('sendmessage',[
                 'chat_id'=>$chat_id,
-                'text'=>'Welcome to Admin panel',
+                'text'=>'Welcome to Teest Admin panel',
                 'reply_markup'=>[
                     'keyboard'=>[
-                        ['📊 Statistics','📝 Create New Post']
+                        ['📊 Statistics','📝 Create New Post'],
+                        ['buy','SendMessage'],
+                        ['Contact Us'],
                     ],
                     'resize_keyboard' => true,
+                    'one_time_keyboard' => true
                 ]
             ]);
 
@@ -316,7 +326,9 @@ function processMessage($update){
                     'caption'=>$query[0]['text_des'],
                     'reply_markup'=>[
                         'inline_keyboard'=>[
-                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$click_id]],
+
+                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start='.$click_id]],
+                            [['text'=>'befahm','callback_data'=>'befahm']],
                             [['text'=>'📥 تعداد دانلود : '.$query[0]['count_click_use']. ' از '.$query[0]['count_click'],'callback_data'=>'null']]
                         ]
                     ]
@@ -328,7 +340,7 @@ function processMessage($update){
                     'caption'=>$query[0]['text_des'],
                     'reply_markup'=>[
                         'inline_keyboard'=>[
-                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$click_id]],
+                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start='.$click_id]],
                             [['text'=>'📥 تعداد دانلود : '.$query[0]['count_click_use']. ' از '.$query[0]['count_click'],'callback_data'=>'null']]
                         ]
                     ]
@@ -340,7 +352,7 @@ function processMessage($update){
                     'caption'=>$query[0]['text_des'],
                     'reply_markup'=>[
                         'inline_keyboard'=>[
-                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$click_id]],
+                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start='.$click_id]],
                             [['text'=>'📥 تعداد دانلود : '.$query[0]['count_click_use']. ' از '.$query[0]['count_click'],'callback_data'=>'null']]
                         ]
                     ]
@@ -364,114 +376,151 @@ function processMessage($update){
         // END : sendMedia
         // ================================
         // Start : check channel
-    }else{
-        $channel_id_1 = '@ProjeYaab';
-        $getchannel1 = bot('getChatMember',[
-            'chat_id'=>$channel_id_1,
-            'user_id'=>$chat_id
-        ]);
-        $getchannel1 = json_decode($getchannel1,true);
-        $channel_id_2 = '@Qbyte';
-        $getchannel2 = bot('getChatMember',[
-            'chat_id'=>$channel_id_2,
-            'user_id'=>$chat_id
-        ]);
-        $getchannel2 = json_decode($getchannel2,true);
-        $channel_id_3 = '@Codento';
-        $getchannel3 = bot('getChatMember',[
-            'chat_id'=>$channel_id_3,
-            'user_id'=>$chat_id
-        ]);
-        $getchannel3 = json_decode($getchannel3,true);
-        $channel_id_4 = '@FullPackage';
-        $getchannel4 = bot('getChatMember',[
-            'chat_id'=>$channel_id_4,
-            'user_id'=>$chat_id
-        ]);
-        $getchannel4 = json_decode($getchannel4,true);
-        $text2 = explode(' ', $text);
-        $text2 = $text2[1];
-        if($getchannel1['result']['status'] != 'left' && $getchannel2['result']['status'] != 'left' && $getchannel3['result']['status'] != 'left' && $getchannel4['result']['status'] != 'left'){
-            if(isset($text2)){
-                // user id for avoid duplicate request
-                $db->insert('INSERT INTO users (user_id) VALUES (:user_id)',['user_id'=>$chat_id]);
-                $result = $db->query('SELECT * FROM clicks WHERE click_id=:click_id',['click_id'=>$text2]);
-
-                $click_use = $result[0]['count_click_use'] +1;
-                bot('editMessageReplyMarkup',[
-                    'chat_id'=>$result[0]['chat_id'],
-                    'message_id'=>$result[0]['message_id'],
-                    'reply_markup'=>[
-                            'inline_keyboard'=>[
-                                [['text'=>'📬 '.$result[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$text2]],
-                                [['text'=>'📥 تعداد دانلود  : '.$click_use.' از '.$result[0]['count_click'],'callback_data'=>'null']]
-                            ]
-                        ]
-
-                ]);
-                $db->modify('UPDATE clicks SET count_click_use=:click_use WHERE click_id=:click_id',['click_use'=>$click_use,'click_id'=>$text2]);
-                if($result[0]['file_id_award'] != null){
-                    bot('sendDocument',[
-                        'chat_id'=>$chat_id,
-                        'document'=>$result[0]['file_id_award']
-                    ]);
-                }else{
-                    bot('sendmessage',[
-                        'chat_id'=>$chat_id,
-                        'text'=>$result[0]['text_award']
-                    ]);
-                }
-                bot('sendmessage',[
-                    'chat_id'=>$chat_id,
-                    'text'=>$result[0]['text_award_after']
-                ]);
-                if($click_use >= $result[0]['count_click']){
-                    bot('editMessageReplyMarkup',[
-                    'chat_id'=>$result[0]['chat_id'],
-                    'message_id'=>$result[0]['message_id'],
-                    'reply_markup'=>[
-                            'inline_keyboard'=>[
-                                [['text'=>'📪 به پایان رسید','callback_data'=>'end']],
-                                [['text'=>'📥 تعداد دانلود  : '.$result[0]['count_click'].' از '.$result[0]['count_click'],'callback_data'=>'null']]
-
-
-
-                            ]
-                        ]
-                    ]);
-                }
-            }
-        }
-        // START : have to Join
-        else{
-            bot('sendmessage',['chat_id'=>$chat_id,'text'=>'برای دریافت ( فایل | لینک | محصول ) این مراحل رو انجام بدید 👇👇
-
-        1⃣ در همه‌ی کانال های زیر عضو شوید.
-
-        @ProjeYaab
-        @Qbyte
-        @FullPackage
-
-        2⃣ بعد از عضویت در کانالهای ذکر شده "حتما" دوباره به کانال @Codento برید و مجددا روی دریافت فایل بزنید.
-
-        📛 اگر مجدد از داخل کانال اقدام نکنید از ربات هیچ پاسخی دریافت نمیکنید.']);
-        }
-        // END : have to Join
     }
+    elseif ($chat_id == 426066593) {
+      if($text == '/start'){
+                  bot('sendmessage',[
+                      'chat_id'=>$chat_id,
+                      'text'=>'کاربر به جز ادمین',
+                      'reply_markup'=>[
+                        'inline_keyboard'=>[
+
+                                [
+                                  ['text'=>'📪 به پایان رسید','callback_data'=>'end'],
+                                  ['text'=>'befahm','callback_data'=>'befahm']
+                                ],
+
+
+                              ],
+                          'resize_keyboard' => true
+                      ]
+                  ]);
+
+              }
+
+    }
+
+    else{
+
+          $channel_id_1 = '@ProjeYaab';
+          $getchannel1 = bot('getChatMember',[
+              'chat_id'=>$channel_id_1,
+              'user_id'=>$chat_id
+          ]);
+          $getchannel1 = json_decode($getchannel1,true);
+          $channel_id_2 = '@Qbyte';
+          $getchannel2 = bot('getChatMember',[
+              'chat_id'=>$channel_id_2,
+              'user_id'=>$chat_id
+          ]);
+          $getchannel2 = json_decode($getchannel2,true);
+          $channel_id_3 = '@Codento';
+          $getchannel3 = bot('getChatMember',[
+              'chat_id'=>$channel_id_3,
+              'user_id'=>$chat_id
+          ]);
+          $getchannel3 = json_decode($getchannel3,true);
+          $channel_id_4 = '@FullPackage';
+          $getchannel4 = bot('getChatMember',[
+              'chat_id'=>$channel_id_4,
+              'user_id'=>$chat_id
+          ]);
+          $getchannel4 = json_decode($getchannel4,true);
+          $text2 = explode(' ', $text);
+          $text2 = $text2[1];
+          $text3 = $text2[2];
+          if($getchannel1['result']['status'] != 'left' && $getchannel2['result']['status'] != 'left' && $getchannel3['result']['status'] != 'left' && $getchannel4['result']['status'] != 'left'){
+              if(isset($text2)){
+                  // user id for avoid duplicate request
+                  $db->insert('INSERT INTO users (user_id) VALUES (:user_id)',['user_id'=>$chat_id]);
+                  $result = $db->query('SELECT * FROM clicks WHERE click_id=:click_id',['click_id'=>$text2]);
+
+                  $click_use = $result[0]['count_click_use'] +1;
+                  bot('editMessageReplyMarkup',[
+                      'chat_id'=>$result[0]['chat_id'],
+                      'message_id'=>$result[0]['message_id'],
+                      'reply_markup'=>[
+                              'inline_keyboard'=>[
+                                  [['text'=>'📬 '.$result[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start='.$text2]],
+                                  [['text'=>'📥 تعداد دانلود  : '.$click_use.' از '.$result[0]['count_click'],'callback_data'=>'null']]
+                              ]
+                          ]
+
+                  ]);
+                  $db->modify('UPDATE clicks SET count_click_use=:click_use WHERE click_id=:click_id',['click_use'=>$click_use,'click_id'=>$text2]);
+                  if($result[0]['file_id_award'] != null){
+                      bot('sendDocument',[
+                          'chat_id'=>$chat_id,
+                          'document'=>$result[0]['file_id_award']
+                      ]);
+                  }else{
+                      bot('sendmessage',[
+                          'chat_id'=>$chat_id,
+                          'text'=>$result[0]['text_award']
+                      ]);
+                  }
+                  bot('sendmessage',[
+                      'chat_id'=>$chat_id,
+                      'text'=>$result[0]['text_award_after']
+                  ]);
+                  bot('sendmessage',[
+                      'chat_id'=>$chat_id,
+                      'text'=>$text3
+                  ]);
+
+                  if($click_use >= $result[0]['count_click']){
+                      bot('editMessageReplyMarkup',[
+                      'chat_id'=>$result[0]['chat_id'],
+                      'message_id'=>$result[0]['message_id'],
+                      'reply_markup'=>[
+                              'inline_keyboard'=>[
+
+                                  [['text'=>'📪 به پایان رسید','callback_data'=>'end']],
+                                  [['text'=>'befahm','callback_data'=>'befahm']],
+                                  [['text'=>'📬 '.$result[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start=1&buy='.$text2]],
+                                  [['text'=>'📥 تعداد دانلود  : '.$result[0]['count_click'].' از '.$result[0]['count_click'],'callback_data'=>'null']]
+
+
+
+                              ]
+                          ]
+                      ]);
+
+                  }
+              }
+          }
+          // START : have to Join
+          else{
+              bot('sendmessage',['chat_id'=>$chat_id,'text'=>'برای دریافت ( فایل | لینک | محصول ) این مراحل رو انجام بدید 👇👇
+
+          1⃣ در همه‌ی کانال های زیر عضو شوید.
+
+          @ProjeYaab
+          @Qbyte
+          @FullPackage
+
+          2⃣ بعد از عضویت در کانالهای ذکر شده "حتما" دوباره به کانال @Codento برید و مجددا روی دریافت فایل بزنید.
+
+          📛 اگر مجدد از داخل کانال اقدام نکنید از ربات هیچ پاسخی دریافت نمیکنید.']);
+          }
+          // END : have to Join
+      }
     // END : check channel
 }
 
 function processCallback($update){
     $data = $update['callback_query']['data'];
     $id = $update['callback_query']['id'];
+    $inline_message_id = $update['callback_query']['inline_message_id'];
     $firstname = $update['callback_query']['from']['first_name'];
-//     $inline_message_id = $update['callback_query']['inline_message_id'];
-//     $firstname = $update['callback_query']['from']['first_name'];
-//     bot('editMessageText',[
-//         'inline_message_id'=>$inline_message_id,
-//         'text'=>'کاربر زیر برنده شد
-// '.$firstname
-//     ]);
+    $chat_id = $update['message']['chat']['id'];
+  //     $inline_message_id = $update['callback_query']['inline_message_id'];
+  //     $firstname = $update['callback_query']['from']['first_name'];
+  //     bot('editMessageText',[
+  //         'inline_message_id'=>$inline_message_id,
+  //         'text'=>'کاربر زیر برنده شد
+  // '.$firstname
+  //     ]);
     if($data == 'null'){
         bot('answerCallbackQuery',[
             'callback_query_id'=>$id,
@@ -482,10 +531,31 @@ function processCallback($update){
             'callback_query_id'=>$id,
             'text'=>'❌ظرفیت دانلود فایل پر شده و شما نمیتونید فایل رو دریافت کنید ❌'
         ]);
-    }elseif($data == 'buy'){
-        bot('answerCallbackQuery',[
-            'callback_query_id'=>$id,
-            'text'=>'به پایان رسید',
-        ]);
+    }elseif($data == 'befahm2'){
+
+      bot('sendmessage',[
+          'chat_id'=>$chat_id,
+          'text'=>'چطور مطوری',
+          'reply_markup'=>[
+              'inline_keyboard'=>[
+                  [['text'=>'ahmad','callback_data'=>'befahm']],
+
+                  [['text'=>'befahm3','callback_data'=>'befahm']]
+              ],
+              'resize_keyboard' => true,
+          ]
+      ]);
+
+      bot('answerCallbackQuery',[
+          'callback_query_id'=>$id,
+          'text'=>'❌AAA ❌'
+      ]);
+
+
     }
+
+}
+
+function inlineMessage($update){
+
 }
