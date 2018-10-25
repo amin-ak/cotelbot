@@ -38,7 +38,7 @@ function processMessage($update){
                 'text'=>'به پنل مدیریت خوش آمدید',
                 'reply_markup'=>[
                     'keyboard'=>[
-                        ['آمار'],['ساخت کلیکر']
+                        ['statistics' , 'New Post']
                     ],
                     'resize_keyboard' => true,
                 ]
@@ -46,7 +46,7 @@ function processMessage($update){
 
         }
         // Start : Clicker
-        else if($text == 'ساخت کلیکر'){
+        else if($text == 'New Post'){
             $click_id = uniqid("click_");
            // $start_id = uniqid("award_");
             // bot('sendmessage',['chat_id'=>412213803,'text'=>$update]);
@@ -81,7 +81,7 @@ function processMessage($update){
         // END : Clicker
         // ========================================
         // Start : Amar
-        else if($text == 'آمار'){
+        else if($text == 'statistics'){
             $member = $db->query('SELECT user_id FROM users');
             $count = count($member);
             bot('sendmessage',[
@@ -105,7 +105,7 @@ function processMessage($update){
                 'text'=>'به منوی اصلی بازگشتید',
                 'reply_markup'=>[
                     'keyboard'=>[
-                        ['آمار'],['ساخت کلیکر']
+                        ['statistics' , 'New Post']
                     ],
                     'resize_keyboard' => true
                 ]
@@ -319,7 +319,7 @@ function processMessage($update){
                     'text'=>'با موفقیت ارسال شد',
                     'reply_markup'=>[
                         'keyboard'=>[
-                            ['آمار'],['ساخت کلیکر']
+                            ['statistics' , 'New Post']
                         ],
                     'resize_keyboard' => true,
                     ]
