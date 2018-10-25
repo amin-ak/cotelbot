@@ -8,11 +8,11 @@ $update = json_decode($content, true);
     if(isset($update["message"])){
         processMessage($update);
     }
-    elseif(isset($update["callback_query"]))
+    else if(isset($update["callback_query"]))
         {
             processCallback($update);
         }
-    elseif(isset($update["inline_query"]))
+    else if(isset($update["inline_query"]))
         {
             inlineMessage($update);
         }
@@ -46,7 +46,7 @@ function processMessage($update){
 
         }
         // Start : Clicker
-        elseif($text == 'ساخت کلیکر'){
+        else if($text == 'ساخت کلیکر'){
             $click_id = uniqid("click_");
            // $start_id = uniqid("award_");
             // bot('sendmessage',['chat_id'=>412213803,'text'=>$update]);
@@ -81,7 +81,7 @@ function processMessage($update){
         // END : Clicker
         // ========================================
         // Start : Amar
-        elseif($text == 'آمار'){
+        else if($text == 'آمار'){
             $member = $db->query('SELECT user_id FROM users');
             $count = count($member);
             bot('sendmessage',[
@@ -92,7 +92,7 @@ function processMessage($update){
         // END : Amar
         // =======================================
         // Start : back button
-        elseif($text == 'بازگشت'){
+        else if($text == 'بازگشت'){
             $result = $db->query('SELECT status,status_click_id FROM admin');
             if($result[0]['status_click_id'] == 0){
                 $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id',['status'=>0,'chat_id'=>$chat_id]);
@@ -137,7 +137,7 @@ function processMessage($update){
                             ],'resize_keyboard' => true,
                         ]
                     ]);
-                }elseif(isset($update['message']['animation']['file_id'])){
+                }else if(isset($update['message']['animation']['file_id'])){
                     $file_id = $update['message']['animation']['file_id'];
                     $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id',['chat_id'=>$chat_id,'status'=>'text_des']);
                     $db->modify('UPDATE clicks SET file_id=:file_id,type=:type WHERE click_id=:click_id',['file_id'=>$file_id,'type'=>'gif','click_id'=>$click_id]);
@@ -150,7 +150,7 @@ function processMessage($update){
                             ],'resize_keyboard' => true,
                         ]
                     ]);
-                }elseif(isset($update['message']['video']['file_id'])){
+                }else if(isset($update['message']['video']['file_id'])){
                     $file_id = $update['message']['video']['file_id'];
                     $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id',['chat_id'=>$chat_id,'status'=>'text_des']);
                     $db->modify('UPDATE clicks SET file_id=:file_id,type=:type WHERE click_id=:click_id',['file_id'=>$file_id,'type'=>'video','click_id'=>$click_id]);
@@ -166,8 +166,8 @@ function processMessage($update){
                 }
             }
             // Start : Description
-            elseif($status == 'text_des'){
-                if(strlen($text) <= 200){
+            else if($status == 'text_des'){
+                if(strlen($text) <= 5200){
                     $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id',['chat_id'=>$chat_id,'status'=>'count_click']);
                     $db->modify('UPDATE clicks SET text_des=:text_des WHERE click_id=:click_id',['text_des'=>$text,'click_id'=>$click_id]);
                     bot('sendmessage',[
@@ -195,7 +195,7 @@ function processMessage($update){
             // End : Description
             // ========================================
             // Start : Click count
-            elseif($status == 'count_click'){
+            else if($status == 'count_click'){
                 $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id',['chat_id'=>$chat_id,'status'=>'btn_name']);
                 $db->modify('UPDATE clicks SET count_click=:count_click WHERE click_id=:click_id',['count_click'=>$text,'click_id'=>$click_id]);
                 bot('sendmessage',[
@@ -211,7 +211,7 @@ function processMessage($update){
             // End : Click count
             // =========================================
             // Start : button Name
-            elseif($status == 'btn_name'){
+            else if($status == 'btn_name'){
                 $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id',['chat_id'=>$chat_id,'status'=>'award']);
                 $db->modify('UPDATE clicks SET btn_name=:btn_name WHERE click_id=:click_id',['btn_name'=>$text,'click_id'=>$click_id]);
                 bot('sendmessage',[
@@ -227,7 +227,7 @@ function processMessage($update){
             // END : button Name
             // ===============================================
             // Start : Award (file-link ...)
-            elseif($status == 'award'){
+            else if($status == 'award'){
                 if(isset($update['message']['document'])){
                     $file_id_award = $update['message']['document']['file_id'];
                     $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id',['chat_id'=>$chat_id,'status'=>'text_award_after']);
@@ -258,7 +258,7 @@ function processMessage($update){
             // End : Award (file-link ...)
             // =====================================
             // Start : After Award Text (file-link )
-            elseif($status == 'text_award_after'){
+            else if($status == 'text_award_after'){
                 $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id',['chat_id'=>$chat_id,'status'=>'send_id']);
                 $db->modify('UPDATE clicks SET text_award_after=:text_after WHERE click_id=:click_id',['text_after'=>$text,'click_id'=>$click_id]);
                 bot('sendmessage',[
@@ -272,7 +272,7 @@ function processMessage($update){
                 ]);
             }
             // End : After Award Text (file-link )
-            elseif($status == 'send_id'){
+            else if($status == 'send_id'){
                 $db->modify('UPDATE admin SET status=:status,status_click_id=:click_id WHERE user_id=:chat_id',['chat_id'=>$chat_id,'click_id'=>'0','status'=>'0']);
                 $query = $db->query('SELECT * FROM clicks WHERE click_id=:click_id',['click_id'=>$click_id]);
                 if($query[0]['type'] == 'photo'){
@@ -287,7 +287,7 @@ function processMessage($update){
                         ]
                     ]
                     ]);
-                }elseif($query[0]['type'] == 'gif'){
+                }else if($query[0]['type'] == 'gif'){
                     $send = bot('sendAnimation',[
                     'chat_id'=>'@'.$text,
                     'animation'=>$query[0]['file_id'],
@@ -299,7 +299,7 @@ function processMessage($update){
                         ]
                     ]
                     ]);
-                }elseif($query[0]['type'] == 'video'){
+                }else if($query[0]['type'] == 'video'){
                     $send = bot('sendVideo',[
                     'chat_id'=>'@'.$text,
                     'video'=>$query[0]['file_id'],
@@ -348,7 +348,7 @@ function processMessage($update){
             'user_id'=>$chat_id
         ]);
         $getchannel3 = json_decode($getchannel3,true);
-        $channel_id_4 = '@ProjeKaar';
+        $channel_id_4 = '@FullPackage';
         $getchannel4 = bot('getChatMember',[
             'chat_id'=>$channel_id_4,
             'user_id'=>$chat_id
@@ -358,59 +358,76 @@ function processMessage($update){
         $text2 = $text2[1];
         if($getchannel1['result']['status'] != 'left' && $getchannel2['result']['status'] != 'left' && $getchannel3['result']['status'] != 'left' && $getchannel4['result']['status'] != 'left'){
             if(isset($text2)){
-                // user id for avoid duplicate request
-                $db->insert('INSERT INTO users (user_id) VALUES (:user_id)',['user_id'=>$chat_id]);
-                $result = $db->query('SELECT * FROM clicks WHERE click_id=:click_id',['click_id'=>$text2]);
+
+              $db->insert('INSERT INTO users (user_id) VALUES (:user_id)',['user_id'=>$chat_id]);
+              $result = $db->query('SELECT * FROM clicks WHERE click_id=:click_id',['click_id'=>$text2]);
+              if ($result[0]['count_click'] > $result[0]['count_click_use']) {
                 $click_use = $result[0]['count_click_use'] +1;
                 bot('editMessageReplyMarkup',[
-                    'chat_id'=>$result[0]['chat_id'],
-                    'message_id'=>$result[0]['message_id'],
-                    'reply_markup'=>[
-                            'inline_keyboard'=>[
-                                [['text'=>'📬 '.$result[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$text2]],
-                                [['text'=>'📥 تعداد دانلود  : '.$click_use.' از '.$result[0]['count_click'],'callback_data'=>'null']]
-                            ]
-                        ]
+                  'chat_id'=>$result[0]['chat_id'],
+                  'message_id'=>$result[0]['message_id'],
+                  'reply_markup'=>[
+                    'inline_keyboard'=>[
+                      [['text'=>'📬 '.$result[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$text2]],
+                      [['text'=>'📥 تعداد دانلود  : '.$click_use.' از '.$result[0]['count_click'],'callback_data'=>'null']]
+                    ]
+                  ]
                 ]);
+                // code...
                 $db->modify('UPDATE clicks SET count_click_use=:click_use WHERE click_id=:click_id',['click_use'=>$click_use,'click_id'=>$text2]);
                 if($result[0]['file_id_award'] != null){
-                    bot('sendDocument',[
-                        'chat_id'=>$chat_id,
-                        'document'=>$result[0]['file_id_award']
-                    ]);
+                  bot('sendDocument',[
+                    'chat_id'=>$chat_id,
+                    'document'=>$result[0]['file_id_award']
+                  ]);
                 }else{
-                    bot('sendmessage',[
-                        'chat_id'=>$chat_id,
-                        'text'=>$result[0]['text_award']
-                    ]);
+                  bot('sendmessage',[
+                    'chat_id'=>$chat_id,
+                    'text'=>$result[0]['text_award']
+                  ]);
                 }
                 bot('sendmessage',[
-                    'chat_id'=>$chat_id,
-                    'text'=>$result[0]['text_award_after']
+                  'chat_id'=>$chat_id,
+                  'text'=>$result[0]['text_award_after']
                 ]);
-                if($click_use >= $result[0]['count_click']){
-                    bot('editMessageReplyMarkup',[
+              } else {
+                // code...
+
+                bot('sendmessage',[
+                  'chat_id'=>$chat_id,
+                  'text'=>' متاسفیم !
+                  اما ظرفیت دانلود فایل پر شده 😑
+                  '
+                ]);
+                //
+
+                  bot('editMessageReplyMarkup',[
                     'chat_id'=>$result[0]['chat_id'],
                     'message_id'=>$result[0]['message_id'],
                     'reply_markup'=>[
-                            'inline_keyboard'=>[
-                                [['text'=>'📪 به پایان رسید','callback_data'=>'end']],
-                                [['text'=>'📥 تعداد دانلود  : '.$result[0]['count_click'].' از '.$result[0]['count_click'],'callback_data'=>'null']]
+                      'inline_keyboard'=>[
+                        [['text'=>'📪 به پایان رسید','callback_data'=>'end']],
+                        [['text'=>'📥 تعداد دانلود  : '.$result[0]['count_click'].' از '.$result[0]['count_click'],'callback_data'=>'null']]
 
-                            ]
-                        ]
-                    ]);
-                }
+                      ]
+                    ]
+                  ]);
+
+
+              }
+
+                // user id for avoid duplicate request
+
             }
         }
         // START : have to Join
-        else{
+        else {
             bot('sendmessage',['chat_id'=>$chat_id,'text'=>'برای دریافت ( فایل | لینک | محصول ) این مراحل رو انجام بدید 👇👇
         1⃣ در همه‌ی کانال های زیر عضو شوید.
         @ProjeYaab
         @Qbyte
         @Codento
-        @ProjeKaar
+        @FullPackage
         2⃣ بعد از عضویت در کانالهای ذکر شده "حتما" دوباره به کانال @Codento برید و مجددا روی دریافت فایل بزنید.
         📛 اگر مجدد از داخل کانال اقدام نکنید از ربات هیچ پاسخی دریافت نمیکنید.']);
         }
@@ -433,12 +450,12 @@ function processCallback($update){
             'callback_query_id'=>$id,
             'text'=>'🚫'
         ]);
-    }elseif($data == 'end'){
+    }else if($data == 'end'){
         bot('answerCallbackQuery',[
             'callback_query_id'=>$id,
             'text'=>'به پایان رسید'
         ]);
-    }elseif($data == 'buy'){
+    }else if($data == 'buy'){
         bot('answerCallbackQuery',[
             'callback_query_id'=>$id,
             'text'=>'به پایان رسید',
