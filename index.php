@@ -460,9 +460,9 @@ function processMessage($update)
                     'text'=>"از کانال اقدام کنید.",
                     'reply_markup'=>[
                         'inline_keyboard'=>[
-                            [['text'=>'برگشت به کانال','url'=>'https://t.me/Codento'],['text'=>'C2','url'=>'https://t.me/FullPackage']],
-                            [['text'=>'inline','url'=>'https://t.me/Codentobotbot?start=1']],
-                            [['text'=>'befahm3','callback_data'=>'befahm2']]
+                            [['text'=>'برگشت به کانال','url'=>'https://t.me/Codento']]
+                            // [['text'=>'inline','url'=>'https://t.me/Codentobotbot?start=1']],
+                            // [['text'=>'befahm3','callback_data'=>'befahm2']]
                         ],
                     'resize_keyboard' => true,
                 ]
@@ -480,7 +480,7 @@ function processMessage($update)
                 $result1 = $db->query('select * from users where user_id=:user_id and click_id=:click_id', ['user_id'=>$chat_id,'click_id' => $result[0]['click_id']]);
                 $user_count_id = count($result1);
 
-                if ($user_count_id != 113) {
+                if ($user_count_id == 0) {
                     bot('sendmessage', [
                     'chat_id'=>$chat_id,
                     'text'=> "
@@ -490,11 +490,6 @@ function processMessage($update)
 
                     $db->insert('INSERT INTO users (user_id,click_id) VALUES (:user_id,:click_id)', ['user_id'=> $chat_id,'click_id'=> $result[0]['click_id']]);
 
-                    $click_use = $result[0]['count_click_use'] + 1;
-                    bot('sendmessage', [
-                        'chat_id'=>$chat_id,
-                        'text' => $click_use
-                    ]);
                     bot('editMessageReplyMarkup', [
                     'chat_id'=>$result[0]['chat_id'],
                     'message_id'=>$result[0]['message_id'],
@@ -507,42 +502,14 @@ function processMessage($update)
                         ]
                 ]);
                     $db->modify('UPDATE clicks SET count_click_use=:click_use WHERE click_id=:click_id', ['click_use'=>$click_use,'click_id'=>$text2]);
-                    $xxx = 1;
+                    
                     
                     if ($result[0]['file_id_award'] == null) {
-                        if ($xxx == 1) {
+                        
                             bot('sendDocument', [
                         'chat_id'=>$chat_id,
                         'document'=>$result[0]['file_id_award']
                     ]);
-
-                    bot('sendmessage', [
-                        'chat_id'=>$chat_id,
-                        'text'=>"با دو روش میتونید فایل مربوط به این پروژه رو دانلود کنید 👇👇",
-                        'reply_markup'=>[
-                            'inline_keyboard'=>[
-                                [['text'=>'دریافت از لینک','callback_data'=>'end']],
-                                [['text'=>'دریافت از طریق لینک','callback_data'=>'GetDirect']],
-                                [['text'=>'befahm3','callback_data'=>'befahm2']]
-                            ],
-                        'resize_keyboard' => true,
-                    ]
-                ]);
-                        } else {
-                            bot(
-                                'sendmessage',
-                                
-                                [
-                                    'chat_id'=>$chat_id,
-                                    'reply_markup'=>[
-                                        'inline_keyboard'=>[
-                                            [['text'=>'دریافت از لینک','callback_data'=>'end']],
-                                            [['text'=>'دریافت مستقیم فایل','callback_data'=>'GetDirect']]
-                                ]
-                                ]
-                    ]
-                    );
-                        }
                     } else {
                         bot(
                             'sendmessage',
@@ -555,43 +522,12 @@ function processMessage($update)
                                 'text'=>"از کانال اقدام کنید.",
                                 'reply_markup'=>[
                                     'inline_keyboard'=>[
-                                        [['text'=>'برگشت به کانال','url'=>'https://t.me/Codento'],['text'=>'C2','url'=>'https://t.me/FullPackage']],
-                                        [['text'=>'inline','url'=>'https://t.me/Codentobotbot?start=1']],
-                                        [['text'=>'befahm3','callback_data'=>'befahm2']]
+                                        [['text'=>'برگشت به کانال','url'=>'https://t.me/Codento']
                                     ],
                                 'resize_keyboard' => true,
+                                ]
                             ]
                         ]);
-                        if ($xxx != 1) {
-                            bot(
-                                'sendmessage',
-                                [
-                                    'chat_id'=>$chat_id,
-                                    'message_id'=>$result[0]['message_id'],
-                    'reply_markup'=>[
-                            'inline_keyboard'=>[
-                                [['text'=>'دریافت از لینک','callback_data'=>'end']],
-                                [['text'=>'دریافت مستقیم فایل','callback_data'=>'GetDirect']]
-                     ]
-                    ]   
-                    ]
-                    );
-                        } else {
-                            bot(
-                                'sendmessage',
-                                
-                                [
-                                    'chat_id'=>$chat_id,
-                                    'reply_markup'=>[
-                                        'inline_keyboard'=>
-                                        [
-                                            [['text'=>'دریافت از لینک','callback_data'=>'end']],
-                                            [['text'=>'دریافت مستقیم فایل','callback_data'=>'GetDirect']]
-                                        ]
-                                ]
-                    ]
-                    );
-                        }
                     }
 
                     // Text Award After
@@ -611,8 +547,6 @@ function processMessage($update)
                     'reply_markup'=>[
                             'inline_keyboard'=>[
                                 [['text'=>'📪 به پایان رسید','callback_data'=>'end']],
-                                [['text'=>'befahm','callback_data'=>'befahm']],
-                                [['text'=>'📬 '.$result[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start=1&buy='.$text2]],
                                 [['text'=>'📥 تعداد دانلود  : '.$result[0]['count_click'].' از '.$result[0]['count_click'],'callback_data'=>'null']]
                             ]
                         ]
@@ -696,28 +630,5 @@ function processCallback($update)
 
           ]
       ]);
-    }elseif($data == 'GetDirect'){
-        $query = $update['callback_query'];
-        $query_id = $query['id'];
-        $query_userID = $query['from']['id'];
-        $query_data = $query['data'];
-
-        bot('sendmessage', [
-            'chat_id'=>$query_userID,
-            'text'=>'قصد دارید اشتراک یک ماهه برای دریافت فایل از طریق تلگرام بخرید',
-            'reply_markup'=>[
-                'keyboard'=>[
-                    ['خبر','بله'],
-                    ['buy','SendMessage'],
-                    ['Contact Us'],
-                ],
-                'resize_keyboard' => true,
-  
-            ]
-        ]);
     }
-}
-
-function inlineMessage($update)
-{
 }
