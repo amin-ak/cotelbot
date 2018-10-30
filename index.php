@@ -59,7 +59,7 @@ function processMessage($update)
             //             'inline_keyboard'=>[
 
             //                 [['text'=>'Go','url'=>'https://t.me/utubebot?start=1&rate=4'],['text'=>'gotoGoogle','url'=>'https://t.me/utubebot?start=1&rate=4']],
-            //                 [['text'=>'inline','url'=>'https://t.me/Codentobotbot?start=1']],
+            //                 [['text'=>'inline','url'=>'https://t.me/Codentobot?start=1']],
             //                 [['text'=>'befahm3','callback_data'=>'befahm2']]
             //         ],
             //             'resize_keyboard' => true,
@@ -357,7 +357,7 @@ function processMessage($update)
                     'reply_markup'=>[
                         'inline_keyboard'=>[
 
-                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start='.$click_id]],
+                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$click_id]],
                             // [['text'=>'befahm','callback_data'=>'befahm']],
                             [['text'=>'📥 تعداد دانلود : '.$query[0]['count_click_use']. ' از '.$query[0]['count_click'],'callback_data'=>'null']]
                         ]
@@ -370,7 +370,7 @@ function processMessage($update)
                     'caption'=>$query[0]['text_des'],
                     'reply_markup'=>[
                         'inline_keyboard'=>[
-                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start='.$click_id]],
+                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$click_id]],
                             [['text'=>'📥 تعداد دانلود : '.$query[0]['count_click_use']. ' از '.$query[0]['count_click'],'callback_data'=>'null']]
                         ]
                     ]
@@ -382,7 +382,7 @@ function processMessage($update)
                     'caption'=>$query[0]['text_des'],
                     'reply_markup'=>[
                         'inline_keyboard'=>[
-                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start='.$click_id]],
+                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$click_id]],
                             [['text'=>'📥 تعداد دانلود : '.$query[0]['count_click_use']. ' از '.$query[0]['count_click'],'callback_data'=>'null']]
                         ]
                     ]
@@ -461,7 +461,7 @@ function processMessage($update)
                     'reply_markup'=>[
                         'inline_keyboard'=>[
                             [['text'=>'برگشت به کانال','url'=>'https://t.me/Codento']]
-                            // [['text'=>'inline','url'=>'https://t.me/Codentobotbot?start=1']],
+                            // [['text'=>'inline','url'=>'https://t.me/Codentobot?start=1']],
                             // [['text'=>'befahm3','callback_data'=>'befahm2']]
                         ],
                     'resize_keyboard' => true,
@@ -489,13 +489,13 @@ function processMessage($update)
                     ]);
 
                     $db->insert('INSERT INTO users (user_id,click_id) VALUES (:user_id,:click_id)', ['user_id'=> $chat_id,'click_id'=> $result[0]['click_id']]);
-
+                    $click_use = $result[0]['count_click_use'] +1;
                     bot('editMessageReplyMarkup', [
                     'chat_id'=>$result[0]['chat_id'],
                     'message_id'=>$result[0]['message_id'],
                     'reply_markup'=>[
                             'inline_keyboard'=>[
-                                [['text'=>'📬 '.$result[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start='.$text2]],
+                                [['text'=>'📬 '.$result[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$text2]],
 
                                 [['text'=>'📥 تعداد دانلود  : '.$click_use.' از '.$result[0]['count_click'],'callback_data'=>'null']]
                             ]
@@ -504,30 +504,17 @@ function processMessage($update)
                     $db->modify('UPDATE clicks SET count_click_use=:click_use WHERE click_id=:click_id', ['click_use'=>$click_use,'click_id'=>$text2]);
                     
                     
-                    if ($result[0]['file_id_award'] == null) {
+                    if ($result[0]['file_id_award'] != null) {
                         
                             bot('sendDocument', [
                         'chat_id'=>$chat_id,
                         'document'=>$result[0]['file_id_award']
                     ]);
-                    } else {
-                        bot(
-                            'sendmessage',
-                            [
-                                'chat_id'=>$chat_id,
-                                'text'=>'else'
+                    }else{
+                        bot('sendmessage',[
+                            'chat_id'=>$chat_id,
+                            'text'=>$result[0]['text_award']
                             ]);
-                            bot('sendmessage', [
-                                'chat_id'=>$chat_id,
-                                'text'=>"از کانال اقدام کنید.",
-                                'reply_markup'=>[
-                                    'inline_keyboard'=>[
-                                        [['text'=>'برگشت به کانال','url'=>'https://t.me/Codento']
-                                    ],
-                                'resize_keyboard' => true,
-                                ]
-                            ]
-                        ]);
                     }
 
                     // Text Award After
