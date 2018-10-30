@@ -522,7 +522,7 @@ function processMessage($update)
                         'reply_markup'=>[
                             'inline_keyboard'=>[
                                 [['text'=>'دریافت از لینک','callback_data'=>'end']],
-                                [['text'=>'دریافت از طریق لینک','callback_data'=>'end1']],
+                                [['text'=>'دریافت از طریق لینک','callback_data'=>'GetDirect']],
                                 [['text'=>'befahm3','callback_data'=>'befahm2']]
                             ],
                         'resize_keyboard' => true,
@@ -697,6 +697,11 @@ function processCallback($update)
           ]
       ]);
     }elseif($data == 'GetDirect'){
+        $query = $update['callback_query'];
+        $query_id = $query['id'];
+        $query_userID = $query['from']['id'];
+        $query_data = $query['data'];
+
         bot('sendmessage', [
             'chat_id'=>$query_userID,
             'text'=>'قصد دارید اشتراک یک ماهه برای دریافت فایل از طریق تلگرام بخرید',
