@@ -10,7 +10,7 @@ $hr = "\n -------------------";
 //
     if (isset($update["message"])) {
         processMessage($update);
-    
+
     } elseif (isset($update["callback_query"])) {
         processCallback($update);
 
@@ -134,15 +134,16 @@ function processMessage($update)
                     ['◀ Back to Menu']
                 ],
                 'resize_keyboard' => true]
-                    
-                
+
+
             ]);
         }
         // END : SendMessage
         // ========================================
+
         // Start : Amar
         elseif ($text == '📊 Statistics') {
-            $member = $db->query('SELECT user_id FROM users');
+            $member = $db->query('SELECT DISTINCT user_id FROM users');
             $count = count($member);
             bot('sendmessage', [
                 'chat_id'=>$chat_id,
@@ -150,6 +151,7 @@ function processMessage($update)
                 ]);
         }
         // END : Amar
+
         // =======================================
         // Start : back button
         elseif ($text == '◀ Back to Menu') {
@@ -207,7 +209,7 @@ function processMessage($update)
                         ]
                     ]);
 
-                   
+
                 } elseif (isset($update['message']['animation']['file_id'])) {
                     $file_id = $update['message']['animation']['file_id'];
                     $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id', ['chat_id'=>$chat_id,'status'=>'text_des']);
@@ -279,7 +281,7 @@ function processMessage($update)
                     ]
                 ]);
             }
-            
+
             // End : Click count
 
             // =========================================
@@ -473,7 +475,7 @@ function processMessage($update)
 
         if ($getchannel1['result']['status'] != 'left' && $getchannel2['result']['status'] != 'left' && $getchannel3['result']['status'] != 'left' && $getchannel4['result']['status'] != 'left') {
             if (isset($text2)) {
-                
+
                 // user id for avoid duplicate request
 
                 $result = $db->query('SELECT * FROM clicks WHERE click_id=:click_id', ['click_id'=>$text2]);
@@ -502,7 +504,7 @@ function processMessage($update)
                     'reply_markup'=>[
                             'inline_keyboard'=>[
                                 [['text'=>'📬 '.$result[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start='.$text2]],
-                                
+
                                 [['text'=>'📥 تعداد دانلود  : '.$click_use.' از '.$result[0]['count_click'],'callback_data'=>'null']]
                             ]
                         ]
@@ -552,7 +554,7 @@ function processMessage($update)
                 }
                 
             }
-            
+
         }
         // START : have to Join
         else {
