@@ -59,7 +59,7 @@ function processMessage($update)
             //             'inline_keyboard'=>[
 
             //                 [['text'=>'Go','url'=>'https://t.me/utubebot?start=1&rate=4'],['text'=>'gotoGoogle','url'=>'https://t.me/utubebot?start=1&rate=4']],
-            //                 [['text'=>'inline','url'=>'https://t.me/Codentobot?start=1']],
+            //                 [['text'=>'inline','url'=>'https://t.me/Codentobotbot?start=1']],
             //                 [['text'=>'befahm3','callback_data'=>'befahm2']]
             //         ],
             //             'resize_keyboard' => true,
@@ -99,15 +99,23 @@ function processMessage($update)
             $click_id = uniqid("click_");
             // ---------------------
             if ($db->modify('UPDATE admin SET status=:status,status_click_id=:click_id WHERE user_id=:chat_id', ['chat_id'=>$chat_id,'click_id'=>$click_id,'status'=>'sendMedia'])) {
-                // bot('sendmessage',['chat_id'=>412213803,'text'=>'clicker is enable']);
+                
+                bot('sendmessage', ['chat_id'=>412213803,'text'=>$click_id]);    
+
+                try {
+                    $db->insert('INSERT INTO clicks (click_id) VALUES (:click_id)', ['click_id'=> $click_id ]);
+                    // $db->insert('INSERT INTO users (user_id,click_id) VALUES (:user_id,:click_id)', ['user_id'=> $chat_id,'click_id'=> $result[0]['click_id']]);
+                    bot('sendmessage', ['chat_id'=>412213803,'text'=>'ok']);    
+                }
+                catch(exception $e){
+                    bot('sendmessage', ['chat_id'=>412213803,'text'=>'catch']);
+                }
+
             } else {
                 bot('sendmessage', ['chat_id'=>412213803,'text'=>'clicker is failed']);
             }
-            if ($db->insert('INSERT INTO clicks (click_id) VALUES (:click_id)', ['click_id'=>$click_id])) {
-                // bot('sendmessage',['chat_id'=>412213803,'text'=>'ok']);
-            } else {
-                // bot('sendmessage',['chat_id'=>412213803,'text'=>'no']);
-            }
+            
+            
             // ---------------------
             bot('sendmessage', [
                 'chat_id'=>$chat_id,
@@ -267,7 +275,7 @@ function processMessage($update)
             // Start : Click count
             elseif ($status == 'count_click') {
                 $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id', ['chat_id'=>$chat_id,'status'=>'btn_name']);
-                $db->modify('UPDATE clicks SET count_click=:count_click WHERE click_id=:click_id', ['count_click'=>$text,'click_id'=>$click_id]);
+                $db->modify('UPDATE clicks SET count_click=:count_click , count_click_use=0 WHERE click_id=:click_id', ['count_click'=>$text,'click_id'=>$click_id]);
                 bot('sendmessage', [
                     'chat_id'=>$chat_id,
                     'text'=>'حالا اسم دکمه رو بفرست',
@@ -304,14 +312,15 @@ function processMessage($update)
                 if (isset($update['message']['document'])) {
                     $file_id_award = $update['message']['document']['file_id'];
                     $db->modify('UPDATE admin SET status=:status WHERE user_id=:chat_id', ['chat_id'=>$chat_id,'status'=>'text_award_after']);
-                    $db->modify('UPDATE clicks SET file_id_award=:award_id WHERE click_id=:click_id', ['award_id'=>$file_id_award,'click_id'=>$click_id]);
+                    $db->modify('UPDATE clicks SET file_id_award=:file_id_award WHERE click_id=:click_id', ['file_id_award'=>$file_id_award,'click_id'=>$click_id]);
                     bot('sendmessage', [
                         'chat_id'=>$chat_id,
                         'text'=>'حالا متن بعدی جایزه رو بفرست',
                         'reply_markup'=>[
                             'keyboard'=>[
-                                ['◀ Back to Menu'],'resize_keyboard' => true,
-                            ]
+                                ['◀ Back to Menu']
+                                
+                            ],'resize_keyboard' => true
                         ]
                     ]);
                 } else {
@@ -357,7 +366,7 @@ function processMessage($update)
                     'reply_markup'=>[
                         'inline_keyboard'=>[
 
-                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$click_id]],
+                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start='.$click_id]],
                             // [['text'=>'befahm','callback_data'=>'befahm']],
                             [['text'=>'📥 تعداد دانلود : '.$query[0]['count_click_use']. ' از '.$query[0]['count_click'],'callback_data'=>'null']]
                         ]
@@ -370,7 +379,7 @@ function processMessage($update)
                     'caption'=>$query[0]['text_des'],
                     'reply_markup'=>[
                         'inline_keyboard'=>[
-                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$click_id]],
+                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start='.$click_id]],
                             [['text'=>'📥 تعداد دانلود : '.$query[0]['count_click_use']. ' از '.$query[0]['count_click'],'callback_data'=>'null']]
                         ]
                     ]
@@ -382,7 +391,7 @@ function processMessage($update)
                     'caption'=>$query[0]['text_des'],
                     'reply_markup'=>[
                         'inline_keyboard'=>[
-                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$click_id]],
+                            [['text'=>'📬 '.$query[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start='.$click_id]],
                             [['text'=>'📥 تعداد دانلود : '.$query[0]['count_click_use']. ' از '.$query[0]['count_click'],'callback_data'=>'null']]
                         ]
                     ]
@@ -461,7 +470,7 @@ function processMessage($update)
                     'reply_markup'=>[
                         'inline_keyboard'=>[
                             [['text'=>'برگشت به کانال','url'=>'https://t.me/Codento']]
-                            // [['text'=>'inline','url'=>'https://t.me/Codentobot?start=1']],
+                            // [['text'=>'inline','url'=>'https://t.me/Codentobotbot?start=1']],
                             // [['text'=>'befahm3','callback_data'=>'befahm2']]
                         ],
                     'resize_keyboard' => true,
@@ -495,7 +504,7 @@ function processMessage($update)
                     'message_id'=>$result[0]['message_id'],
                     'reply_markup'=>[
                             'inline_keyboard'=>[
-                                [['text'=>'📬 '.$result[0]['btn_name'],'url'=>'http://t.me/Codentobot?start='.$text2]],
+                                [['text'=>'📬 '.$result[0]['btn_name'],'url'=>'http://t.me/Codentobotbot?start='.$text2]],
 
                                 [['text'=>'📥 تعداد دانلود  : '.$click_use.' از '.$result[0]['count_click'],'callback_data'=>'null']]
                             ]
